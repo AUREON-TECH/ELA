@@ -280,7 +280,7 @@ async function requestNotificationPermission() {
 }
 
 function scheduleEventReminder(event) {
-  if (!event?.reminderEnabled || Notification.permission !== 'granted') return;
+  if (!('Notification' in window) || !event?.reminderEnabled || Notification.permission !== 'granted') return;
   const eventAt = new Date(`${event.date}T${event.time || '09:00'}:00`);
   const delay = eventAt.getTime() - Date.now() - (Number(event.reminderMinutesBefore || 30) * 60000);
   if (delay <= 0 || delay > 2147483647) return;
@@ -375,6 +375,10 @@ $('symptomLevels').querySelector('[data-level="1"]').classList.add('on');
 renderAll();
 loadSelfCareForm();
 
-if ('Notification' in window) $('notificationStatus').textContent = Notification.permission === 'granted' ? 'Notificações permitidas ✓' : 'Ative para receber lembretes enquanto o app estiver ativo.';
-if (Notification?.permission === 'granted') scheduleActiveReminders();
+if ('Notification' in window) {
+  $('notificationStatus').textContent = Notification.permission === 'granted' ? 'Notificações permitidas ✓' : 'Ative para receber lembretes enquanto o app estiver ativo.';
+  if (Notification.permission === 'granted') scheduleActiveReminders();
+} else {
+  $('notificationStatus').textContent = 'Este navegador não suporta notificações.';
+}
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js', { updateViaCache:'none' }).then(registration => registration.update().catch(() => {}));
