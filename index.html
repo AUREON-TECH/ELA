@@ -1,1 +1,155 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#d81b60"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><title>ELA • Ciclo & Bem-estar</title><link rel="manifest" href="./manifest.webmanifest"><style>*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(160deg,#fff0f6,#f3e5f5);color:#42162f}.app{max-width:760px;margin:auto;padding:16px 16px 92px}.hero{background:linear-gradient(135deg,#e91e63,#8e24aa,#ff7043);color:#fff;padding:24px;border-radius:28px;box-shadow:0 16px 45px #8e245033}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 8px 25px #6d214f14}.card b{display:block;font-size:21px;margin-top:5px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chips button,.btn{border:0;border-radius:14px;padding:11px 13px;background:#f8bbd0;color:#6a173e;font-weight:800;cursor:pointer}.chips button.on{background:#d81b60;color:white}.btn{display:block;text-align:center;text-decoration:none;background:linear-gradient(135deg,#d81b60,#8e24aa);color:#fff;width:100%;margin-top:8px}textarea,input,select{width:100%;border:1px solid #f2bfd1;border-radius:14px;padding:12px;margin:6px 0 10px;background:#fff;font:inherit}.small{opacity:.72;font-size:13px}.view{display:none}.view.active{display:block}.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(728px,calc(100% - 20px));display:flex;justify-content:space-around;background:#fff;border-radius:22px;padding:10px 5px;box-shadow:0 8px 30px #6d214f33;z-index:5}.nav button{border:0;background:none;color:#6a173e;font-weight:800;font-size:12px}.insight{border-left:4px solid #e91e63;padding-left:12px;margin:10px 0}.range{accent-color:#d81b60}@media(max-width:520px){.app{padding:10px 10px 88px}.grid{grid-template-columns:1fr 1fr}.hero{border-radius:22px;padding:20px}.nav button{font-size:11px}}</style></head><body><main class="app"><section id="hoje" class="view active"><div class="hero"><div class="small">SEU ESPAÇO PESSOAL</div><h1>Olá, ELA 🌷</h1><p>Seu corpo fala. Seus registros ajudam você a entender seus padrões.</p></div><section class="grid"><div class="card">🩸 Ciclo<b id="cycle">—</b><span class="small" id="nextPeriod">Registre seu ciclo</span></div><div class="card">🌙 Fase<b id="phase">—</b><span class="small" id="fertile">Estimativa pessoal</span></div><div class="card">✨ Hoje<b id="sign">Cuide de você</b><span class="small" id="signLabel">Mensagem do dia</span></div><div class="card">💗 Humor<b id="moodLabel">Como está?</b><span class="small">Check-in diário</span></div></section><section class="card"><h2>Check-in de hoje</h2><div class="small">Leva menos de 20 segundos e ajuda a encontrar seus padrões.</div><p><b>Humor</b></p><div class="chips" id="moods"><button data-v="Radiante ✨">✨</button><button data-v="Bem 😊">😊</button><button data-v="Sensível 🥹">🥹</button><button data-v="Cansada 😴">😴</button><button data-v="Irritada 😤">😤</button></div><p><b>Energia: <span id="energyVal">5</span>/10</b></p><input class="range" id="energy" type="range" min="1" max="10" value="5"><p><b>Sintomas</b></p><div class="chips" id="symptoms"><button data-v="Cólica">Cólica</button><button data-v="Inchaço">Inchaço</button><button data-v="Dor de cabeça">Dor de cabeça</button><button data-v="Ansiedade">Ansiedade</button><button data-v="Pele">Pele</button><button data-v="Sono">Sono</button></div><button class="btn" onclick="saveCheckin()">Salvar check-in</button><div id="checkSaved" class="small"></div></section><section class="card"><h2>Insights</h2><div id="insights" class="insight">Faça seus check-ins para o ELA começar a mostrar padrões pessoais.</div></section><section class="card"><h2>Seu signo ✨</h2><select id="zodiac"><option value="">Escolha seu signo</option><option>Áries</option><option>Touro</option><option>Gêmeos</option><option>Câncer</option><option>Leão</option><option>Virgem</option><option>Libra</option><option>Escorpião</option><option>Sagitário</option><option>Capricórnio</option><option>Aquário</option><option>Peixes</option></select><button class="btn" onclick="saveZodiac()">Salvar signo</button><p class="small">Mensagens de bem-estar e entretenimento, não previsões factuais.</p></section></section><section id="ciclo" class="view"><div class="hero"><h1>Meu Ciclo 🩸</h1><p>Acompanhe suas fases e previsões.</p></div><section class="card"><label>Primeiro dia da última menstruação</label><input id="lastPeriod" type="date"><label>Duração média do ciclo</label><input id="cycleLength" type="number" min="20" max="45" value="28"><label>Duração média da menstruação</label><input id="periodLength" type="number" min="2" max="10" value="5"><button class="btn" onclick="saveCycle()">Salvar ciclo</button></section><section class="card"><h2>Previsões</h2><div id="cycleDetails">Adicione os dados acima.</div><p class="small">As datas são estimativas e não devem ser usadas como método contraceptivo ou diagnóstico.</p><a class="btn" href="./calendar.html">Abrir calendário visual 📅</a></section></section><section id="eu" class="view"><div class="hero"><h1>Eu 💗</h1><p>Seu histórico, seu diário e seus padrões.</p></div><section class="card"><h2>Diário</h2><textarea id="note" rows="5" placeholder="Como foi seu dia? Sintomas, emoções, autocuidado..."></textarea><button class="btn" onclick="saveNote()">Salvar anotação</button><div id="saved" class="small"></div></section><section class="card"><h2>Histórico recente</h2><div id="history" class="small">Nenhum registro ainda.</div></section></section><section id="agenda" class="view"><div class="hero"><h1>Agenda 📅</h1><p>Cuide de você e do seu tempo.</p></div><section class="card"><input id="eventDate" type="date"><input id="eventText" placeholder="Compromisso ou lembrete"><button class="btn" onclick="saveEvent()">Adicionar</button></section><section class="card"><h2>Próximos</h2><div id="events" class="small">Nenhum compromisso.</div></section></section><section id="ia" class="view"><div class="hero"><h1>ELA IA ✨</h1><p>Uma área preparada para transformar seus registros em orientação personalizada.</p></div><section class="card"><h2>Em evolução</h2><p>O ELA já organiza localmente ciclo, humor, sintomas, energia, diário e agenda. A conversa inteligente será conectada quando houver backend seguro e autenticação.</p><p class="small">A ELA IA não substituirá avaliação ou orientação médica.</p></section></section><nav class="nav"><button onclick="go('hoje')">🏠<br>Hoje</button><button onclick="go('ciclo')">🩸<br>Ciclo</button><button onclick="go('eu')">💗<br>Eu</button><button onclick="go('agenda')">📅<br>Agenda</button><button onclick="go('ia')">✨<br>ELA IA</button></nav></main><script>const K='ela-pwa-v2',old=JSON.parse(localStorage.getItem('ela-pwa-v1')||'{}'),state=JSON.parse(localStorage.getItem(K)||JSON.stringify(old));const $=id=>document.getElementById(id),today=()=>new Date().toISOString().slice(0,10);$('lastPeriod').value=state.lastPeriod||'';$('cycleLength').value=state.cycleLength||28;$('periodLength').value=state.periodLength||5;$('zodiac').value=state.zodiac||'';function save(){localStorage.setItem(K,JSON.stringify(state))}function go(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');scrollTo(0,0)}document.querySelectorAll('#moods button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#moods button').forEach(x=>x.classList.remove('on'));b.classList.add('on');state.tempMood=b.dataset.v;$('moodLabel').textContent=b.dataset.v});document.querySelectorAll('#symptoms button').forEach(b=>b.onclick=()=>b.classList.toggle('on'));$('energy').oninput=e=>$('energyVal').textContent=e.target.value;function saveCheckin(){const symptoms=[...document.querySelectorAll('#symptoms button.on')].map(x=>x.dataset.v);state.checkins=state.checkins||[];const entry={date:today(),mood:state.tempMood||state.mood||'',energy:+$('energy').value,symptoms};state.checkins=state.checkins.filter(x=>x.date!==entry.date);state.checkins.unshift(entry);state.mood=entry.mood;state.moodDate=entry.date;save();$('checkSaved').textContent='Check-in de hoje salvo ✓';render()}function saveCycle(){state.lastPeriod=$('lastPeriod').value;state.cycleLength=+$('cycleLength').value||28;state.periodLength=+$('periodLength').value||5;save();render()}function saveZodiac(){state.zodiac=$('zodiac').value;save();renderSign()}function cycleInfo(){if(!state.lastPeriod)return null;const start=new Date(state.lastPeriod+'T12:00:00'),now=new Date(),elapsed=Math.max(0,Math.floor((now-start)/86400000)),n=(elapsed%state.cycleLength)+1,next=new Date(start);next.setDate(start.getDate()+(Math.floor(elapsed/state.cycleLength)+1)*state.cycleLength);const ov=Math.max(1,state.cycleLength-14),f1=ov-5,f2=ov+1;let ph=n<=state.periodLength?'Menstrual':n<f1?'Folicular':n<=f2?'Fértil':n<state.cycleLength-4?'Lútea':'Pré-menstrual';return{n,next,ov,f1,f2,ph}}function saveNote(){if(!$('note').value.trim())return;state.notes=state.notes||[];state.notes.unshift({date:new Date().toISOString(),text:$('note').value.trim()});save();$('note').value='';$('saved').textContent='Anotação salva no aparelho ✓';renderHistory()}function saveEvent(){if(!$('eventDate').value||!$('eventText').value.trim())return;state.events=state.events||[];state.events.push({date:$('eventDate').value,text:$('eventText').value.trim()});save();$('eventText').value='';renderEvents()}function renderHistory(){const c=(state.checkins||[]).slice(0,5).map(x=>`<p><b>${x.date}</b> · ${x.mood||'—'} · Energia ${x.energy}/10${x.symptoms.length?' · '+x.symptoms.join(', '):''}</p>`).join('');const n=(state.notes||[]).slice(0,3).map(x=>`<p>✍️ ${new Date(x.date).toLocaleDateString('pt-BR')} · ${x.text}</p>`).join('');$('history').innerHTML=c+n||'Nenhum registro ainda.'}function renderEvents(){const a=(state.events||[]).filter(x=>x.date>=today()).sort((a,b)=>a.date.localeCompare(b.date));$('events').innerHTML=a.map(x=>`<p>📅 <b>${x.date.split('-').reverse().join('/')}</b> · ${x.text}</p>`).join('')||'Nenhum compromisso.'}function renderSign(){const msgs=['Seu ritmo também merece respeito.','Escute seu corpo sem julgamento.','Pequenos cuidados também contam.','Hoje, escolha algo que faça bem a você.','Conhecer seus padrões é uma forma de autocuidado.','Reserve alguns minutos para você hoje.','Nem todo dia precisa ter o mesmo ritmo.'];const seed=(new Date().getDate()+(state.zodiac||'ELA').length)%msgs.length;$('sign').textContent=msgs[seed];$('signLabel').textContent=state.zodiac?state.zodiac+' · mensagem do dia':'Escolha seu signo abaixo'}function render(){const c=cycleInfo();if(c){$('cycle').textContent='Dia '+c.n;$('phase').textContent=c.ph;$('nextPeriod').textContent='Próxima: '+c.next.toLocaleDateString('pt-BR');$('fertile').textContent=`Janela estimada: dias ${c.f1}–${c.f2}`;$('cycleDetails').innerHTML=`<p><b>Dia ${c.n}</b> do ciclo · fase ${c.ph}</p><p>Ovulação estimada: dia ${c.ov} · janela fértil: dias ${c.f1} a ${c.f2}</p><p>Próxima menstruação estimada: <b>${c.next.toLocaleDateString('pt-BR')}</b></p>`}$('moodLabel').textContent=state.mood||'Como está?';const cs=state.checkins||[];if(cs.length>=3){const avg=(cs.slice(0,7).reduce((s,x)=>s+x.energy,0)/Math.min(7,cs.length)).toFixed(1);const all=cs.slice(0,7).flatMap(x=>x.symptoms),freq=Object.entries(all.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{})).sort((a,b)=>b[1]-a[1])[0];$('insights').textContent=`Sua energia média nos últimos registros é ${avg}/10.${freq?' Sintoma mais registrado recentemente: '+freq[0]+'.':''}`}renderSign();renderHistory();renderEvents()}render();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update().catch(()=>{}));</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#d81b60">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>ELA • Ciclo & Bem-estar</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+    *{box-sizing:border-box} :root{--pink:#d81b60;--purple:#8e24aa;--orange:#ff7043;--ink:#42162f;--soft:#fff0f6;--line:#f2bfd1;--card:#fff;--shadow:#6d214f18}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(160deg,#fff0f6,#f3e5f5 58%,#fff3e0);color:var(--ink);min-height:100vh}
+    button,input,select,textarea{font:inherit}.app{max-width:780px;margin:auto;padding:14px 14px 104px}.hero{background:linear-gradient(135deg,#e91e63,#8e24aa 55%,#ff7043);color:#fff;padding:24px;border-radius:28px;box-shadow:0 16px 45px #8e245033}.hero h1{margin:5px 0 8px;font-size:31px}.hero p{margin:0;opacity:.94;line-height:1.5}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.13em;opacity:.86}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:14px 0}.card{background:rgba(255,255,255,.96);border:1px solid #fff;border-radius:22px;padding:17px;margin:12px 0;box-shadow:0 8px 26px var(--shadow)}.summary-card{min-height:118px}.summary-card b{display:block;font-size:20px;margin:8px 0 4px}.small,.muted{opacity:.68;font-size:13px;line-height:1.45}.section-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.section-title h2{margin:0 0 4px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chips button,.chip{border:0;border-radius:999px;padding:10px 12px;background:#f8bbd0;color:#6a173e;font-weight:850;cursor:pointer}.chips button.on{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 6px 18px #d81b6030}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:800}.btn{display:block;width:100%;border:0;border-radius:15px;padding:12px 14px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:900;text-align:center;text-decoration:none;cursor:pointer;box-shadow:0 8px 20px #8e24aa24}.btn.secondary{background:#fff0f6;color:#7b204b;box-shadow:none;border:1px solid #f3c0d3}.btn.ghost{background:#fff;color:#7b204b;box-shadow:none;border:1px solid #ead1dc}.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1;border:0;border-radius:12px;padding:9px;background:#f8bbd0;color:#6a173e;font-weight:800;cursor:pointer}.actions .danger{background:#fff1f3;color:#a51d3c}.range{accent-color:var(--pink);width:100%}textarea,input,select{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;color:var(--ink)}textarea{resize:vertical}.metric-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f8e2eb}.metric-row:last-child{border-bottom:0}.metric-row b{text-align:right}.insight{border-left:4px solid var(--pink);padding:10px 12px;margin:9px 0;background:#fff8fb;border-radius:0 14px 14px 0}.insight p{margin:5px 0 0;line-height:1.45}.list-item{border:1px solid #f2d5e0;background:#fff9fb;border-radius:16px;padding:13px;margin:10px 0}.list-item h3,.list-item p{margin:7px 0;line-height:1.45}.list-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.tag,.mini-tags span{display:inline-block;border-radius:999px;background:#f3e5f5;color:#6a256e;padding:5px 8px;font-size:12px;font-weight:800}.mini-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.toggle{display:flex;align-items:center;gap:9px;padding:10px 0}.toggle input{width:auto;transform:scale(1.15)}.status{min-height:20px;margin-top:7px;color:#7b204b;font-size:13px;font-weight:700}.view{display:none}.view.active{display:block}.notice{background:#fff8e1;border:1px solid #ffe0a3;border-radius:15px;padding:12px;font-size:13px;line-height:1.5}.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:max(9px,env(safe-area-inset-bottom));width:min(752px,calc(100% - 16px));display:grid;grid-template-columns:repeat(6,1fr);gap:2px;background:rgba(255,255,255,.97);border:1px solid #f4d6e2;border-radius:23px;padding:8px 5px;box-shadow:0 10px 34px #6d214f35;z-index:20;backdrop-filter:blur(16px)}.nav button{border:0;background:none;color:#7b4160;font-weight:850;font-size:10px;padding:5px 2px;border-radius:13px;cursor:pointer}.nav button span{display:block;font-size:18px;margin-bottom:2px}.nav button.active{background:#fff0f6;color:var(--pink)}
+    @media(max-width:540px){.app{padding:9px 9px 98px}.hero{padding:20px;border-radius:22px}.hero h1{font-size:27px}.card{padding:14px;border-radius:19px}.field-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.summary-card{min-height:106px}.nav button{font-size:9px}.nav button span{font-size:17px}}
+    @media(max-width:370px){.grid{grid-template-columns:1fr}.nav{grid-template-columns:repeat(3,1fr);bottom:6px}.app{padding-bottom:142px}.nav button{font-size:10px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <section id="hoje" class="view active">
+    <div class="hero">
+      <div class="eyebrow">SEU ESPAÇO PESSOAL</div>
+      <h1>Olá, ELA 🌷</h1>
+      <p>Ciclo, humor, sintomas e autocuidado reunidos para você entender seus próprios padrões com mais clareza.</p>
+    </div>
+
+    <section class="grid">
+      <div class="card summary-card">🩸 Ciclo<b id="cycle">—</b><span class="small" id="nextPeriod">Registre seu ciclo</span></div>
+      <div class="card summary-card">🌙 Fase<b id="phase">—</b><span class="small" id="fertile">Estimativa pessoal</span></div>
+      <div class="card summary-card">✨ Hoje<b id="sign">Cuide de você</b><span class="small" id="signLabel">Mensagem do dia</span></div>
+      <div class="card summary-card">💗 Humor<b id="moodLabel">Como está?</b><span class="small">Check-in diário</span></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title"><div><h2>Check-in de hoje</h2><div class="small">Registre como seu corpo e sua energia estão hoje.</div></div><span>💗</span></div>
+      <p><b>Humor</b></p>
+      <div class="chips" id="moods">
+        <button data-v="Radiante ✨">✨ Radiante</button><button data-v="Bem 😊">😊 Bem</button><button data-v="Sensível 🥹">🥹 Sensível</button><button data-v="Cansada 😴">😴 Cansada</button><button data-v="Irritada 😤">😤 Irritada</button>
+      </div>
+
+      <p><b>Energia: <span id="energyVal">5</span>/10</b></p>
+      <input class="range" id="energy" type="range" min="1" max="10" value="5">
+
+      <p><b>Sintomas</b></p>
+      <div class="chips" id="symptoms">
+        <button data-v="Cólica">Cólica</button><button data-v="Inchaço">Inchaço</button><button data-v="Dor de cabeça">Dor de cabeça</button><button data-v="Ansiedade">Ansiedade</button><button data-v="Pele">Pele</button><button data-v="Sono">Sono</button><button data-v="Sensibilidade mamária">Sensibilidade mamária</button><button data-v="Náusea">Náusea</button>
+      </div>
+      <p><b>Intensidade dos sintomas selecionados</b></p>
+      <div class="chips" id="symptomLevels"><button data-level="1">Leve</button><button data-level="2">Moderada</button><button data-level="3">Intensa</button></div>
+
+      <div class="field-grid" style="margin-top:14px">
+        <div class="field"><label for="flow">Fluxo menstrual</label><select id="flow"><option value="">Não se aplica</option><option>Leve</option><option>Moderado</option><option>Intenso</option></select></div>
+        <div class="field"><label for="sleepQuality">Qualidade do sono</label><select id="sleepQuality"><option value="">Não informar</option><option>Ruim</option><option>Regular</option><option>Bom</option></select></div>
+        <div class="field"><label for="sleepHours">Horas de sono</label><input id="sleepHours" type="number" min="0" max="24" step="0.5" placeholder="Ex.: 7.5"></div>
+        <div class="field"><label for="libido">Libido</label><select id="libido"><option value="">Não informar</option><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+        <div class="field full"><label for="cramp">Intensidade da cólica: <span id="crampVal">0</span>/10</label><input class="range" id="cramp" type="range" min="0" max="10" value="0"></div>
+      </div>
+      <button class="btn" id="saveCheckinButton">Salvar check-in</button><div id="checkSaved" class="status"></div>
+    </section>
+
+    <section class="card"><div class="section-title"><div><h2>Insights pessoais</h2><div class="small">Somente padrões descritivos dos seus próprios registros.</div></div><span>📊</span></div><div id="insights"></div></section>
+
+    <section class="card">
+      <h2>Seu signo ✨</h2>
+      <div class="field"><label for="zodiac">Meu signo</label><select id="zodiac"><option value="">Escolha seu signo</option><option>Áries</option><option>Touro</option><option>Gêmeos</option><option>Câncer</option><option>Leão</option><option>Virgem</option><option>Libra</option><option>Escorpião</option><option>Sagitário</option><option>Capricórnio</option><option>Aquário</option><option>Peixes</option></select></div>
+      <button class="btn" id="saveZodiacButton">Salvar signo</button><div id="zodiacSaved" class="status"></div>
+      <a class="btn secondary" href="./signos.html">Abrir mensagem do signo</a>
+      <p class="small">Conteúdo de bem-estar e entretenimento; não é previsão factual nem orientação médica.</p>
+    </section>
+  </section>
+
+  <section id="ciclo" class="view">
+    <div class="hero"><div class="eyebrow">ACOMPANHAMENTO</div><h1>Meu Ciclo 🩸</h1><p>Configure sua média para acompanhar fases e datas estimadas.</p></div>
+    <section class="card">
+      <div class="field-grid">
+        <div class="field full"><label for="lastPeriod">Primeiro dia da última menstruação</label><input id="lastPeriod" type="date"></div>
+        <div class="field"><label for="cycleLength">Duração média do ciclo</label><input id="cycleLength" type="number" min="20" max="45" value="28"></div>
+        <div class="field"><label for="periodLength">Duração média da menstruação</label><input id="periodLength" type="number" min="2" max="10" value="5"></div>
+      </div>
+      <button class="btn" id="saveCycleButton">Salvar ciclo</button><div id="cycleSaved" class="status"></div>
+    </section>
+    <section class="card"><h2>Previsões</h2><div id="cycleDetails"></div><div class="notice">As datas são estimativas baseadas nos dados informados. Não use estas previsões como método contraceptivo ou diagnóstico.</div><a class="btn" href="./calendar.html">Abrir calendário visual 📅</a></section>
+  </section>
+
+  <section id="eu" class="view">
+    <div class="hero"><div class="eyebrow">SEU HISTÓRICO</div><h1>Eu 💗</h1><p>Escreva, pesquise e revise seus registros pessoais.</p></div>
+    <section class="card">
+      <h2>Diário</h2>
+      <input type="hidden" id="editingNoteId">
+      <div class="field"><label for="diaryDate">Data</label><input id="diaryDate" type="date"></div>
+      <div class="field"><label for="note">Anotação</label><textarea id="note" rows="5" placeholder="Como foi seu dia? Emoções, sintomas, autocuidado..."></textarea></div>
+      <div class="actions"><button class="btn" id="saveNoteButton">Salvar anotação</button><button class="btn ghost" id="cancelNoteButton">Limpar</button></div><div id="saved" class="status"></div>
+    </section>
+    <section class="card">
+      <h2>Pesquisar diário</h2>
+      <div class="field-grid"><div class="field full"><label for="diarySearch">Texto</label><input id="diarySearch" placeholder="Buscar palavra ou sentimento..."></div><div class="field"><label for="diaryStart">De</label><input id="diaryStart" type="date"></div><div class="field"><label for="diaryEnd">Até</label><input id="diaryEnd" type="date"></div></div>
+      <div id="history"></div>
+    </section>
+  </section>
+
+  <section id="agenda" class="view">
+    <div class="hero"><div class="eyebrow">LEMBRETES</div><h1>Agenda 📅</h1><p>Organize seus compromissos e ative lembretes quando quiser.</p></div>
+    <section class="card">
+      <input type="hidden" id="editingEventId">
+      <div class="field-grid">
+        <div class="field"><label for="eventDate">Data</label><input id="eventDate" type="date"></div>
+        <div class="field"><label for="eventTime">Horário</label><input id="eventTime" type="time" value="09:00"></div>
+        <div class="field full"><label for="eventTitle">Compromisso</label><input id="eventTitle" placeholder="Ex.: consulta, treino, autocuidado"></div>
+        <div class="field"><label for="eventCategory">Categoria</label><select id="eventCategory"><option>Saúde</option><option>Autocuidado</option><option>Trabalho</option><option selected>Pessoal</option><option>Outro</option></select></div>
+        <div class="field"><label for="eventReminderMinutes">Avisar antes</label><select id="eventReminderMinutes"><option value="10">10 minutos</option><option value="30" selected>30 minutos</option><option value="60">1 hora</option><option value="1440">1 dia</option></select></div>
+        <div class="field full"><label for="eventNotes">Observação</label><textarea id="eventNotes" rows="3" placeholder="Informações opcionais"></textarea></div>
+      </div>
+      <label class="toggle"><input id="eventReminder" type="checkbox"> Ativar lembrete para este compromisso</label>
+      <div class="actions"><button class="btn" id="saveEventButton">Adicionar compromisso</button><button class="btn ghost" id="cancelEventButton">Limpar</button></div><div id="eventSaved" class="status"></div>
+    </section>
+    <section class="card"><h2>Notificações</h2><p class="small" id="notificationStatus"></p><button class="btn secondary" id="requestNotifications">Ativar notificações</button><p class="small">Nesta fase, os lembretes são locais e funcionam como melhor esforço enquanto o app está ativo. Push em segundo plano será conectado ao backend seguro.</p></section>
+    <section class="card"><h2>Próximos compromissos</h2><div id="events"></div></section>
+  </section>
+
+  <section id="autocuidado" class="view">
+    <div class="hero"><div class="eyebrow">ROTINA PESSOAL</div><h1>Autocuidado & Beleza ✨</h1><p>Registre hábitos leves de bem-estar sem transformar isso em diagnóstico.</p></div>
+    <section class="card">
+      <div class="field-grid">
+        <div class="field full"><label for="selfCareDate">Data</label><input id="selfCareDate" type="date"></div>
+        <div class="field"><label for="water">Água (copos)</label><input id="water" type="number" min="0" max="30" placeholder="Ex.: 8"></div>
+        <div class="field"><label for="selfSleep">Sono (horas)</label><input id="selfSleep" type="number" min="0" max="24" step="0.5" placeholder="Ex.: 7.5"></div>
+        <div class="field"><label for="exercise">Exercício (minutos)</label><input id="exercise" type="number" min="0" max="600" placeholder="Ex.: 30"></div>
+        <div class="field"><label for="skin">Pele</label><select id="skin"><option value="">Não informar</option><option>Ruim</option><option>Normal</option><option>Boa</option></select></div>
+        <div class="field"><label for="hair">Cabelo</label><select id="hair"><option value="">Não informar</option><option>Ruim</option><option>Normal</option><option>Bom</option></select></div>
+        <div class="field full"><label for="selfCareNotes">Observação</label><textarea id="selfCareNotes" rows="4" placeholder="Skincare, hidratação, descanso, cuidados pessoais..."></textarea></div>
+      </div>
+      <label class="toggle"><input id="selfCareDone" type="checkbox"> Fiz algum momento de autocuidado hoje</label>
+      <button class="btn" id="saveSelfCareButton">Salvar autocuidado</button><div id="selfCareSaved" class="status"></div>
+    </section>
+  </section>
+
+  <section id="ia" class="view">
+    <div class="hero"><div class="eyebrow">PRÓXIMA ETAPA</div><h1>ELA IA ✨</h1><p>Uma área preparada para transformar seus próprios registros em orientação personalizada.</p></div>
+    <section class="card"><h2>Base preparada</h2><p>O ELA já organiza ciclo, humor, sintomas, energia, diário, agenda e autocuidado. A conversa inteligente será conectada somente depois de autenticação, Supabase, RLS, sincronização e privacidade estarem validados.</p><div class="notice">A ELA IA não substituirá avaliação, diagnóstico ou orientação médica.</div></section>
+  </section>
+
+  <nav class="nav" aria-label="Navegação principal">
+    <button class="active" data-view="hoje"><span>🏠</span>Hoje</button>
+    <button data-view="ciclo"><span>🩸</span>Ciclo</button>
+    <button data-view="eu"><span>💗</span>Eu</button>
+    <button data-view="agenda"><span>📅</span>Agenda</button>
+    <button data-view="autocuidado"><span>✨</span>Cuidado</button>
+    <button data-view="ia"><span>🪄</span>ELA IA</button>
+  </nav>
+</main>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
