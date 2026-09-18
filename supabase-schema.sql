@@ -55,12 +55,18 @@ create table if not exists public.agenda_events (
   event_time time,
   title text not null check (char_length(title) <= 500),
   reminder_enabled boolean not null default false,
+  completed boolean not null default false,
+  completed_at timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  check (completed or completed_at is null)
 );
 
--- Compatibilidade caso agenda_events já tenha sido criada pela versão anterior.
+-- Compatibilidade caso agenda_events já tenha sido criada por versões anteriores.
 alter table public.agenda_events add column if not exists event_time time;
+alter table public.agenda_events add column if not exists reminder_enabled boolean not null default false;
+alter table public.agenda_events add column if not exists completed boolean not null default false;
+alter table public.agenda_events add column if not exists completed_at timestamptz;
 alter table public.agenda_events add column if not exists updated_at timestamptz not null default now();
 
 alter table public.profiles enable row level security;
@@ -119,6 +125,7 @@ create index if not exists checkins_user_date_idx on public.checkins(user_id, ch
 create index if not exists wellbeing_user_date_idx on public.wellbeing_entries(user_id, entry_date desc);
 create index if not exists diary_user_date_idx on public.diary_entries(user_id, entry_date desc);
 create index if not exists agenda_user_date_idx on public.agenda_events(user_id, event_date, event_time);
+create index if not exists agenda_user_completed_date_idx on public.agenda_events(user_id, completed, event_date, event_time);
 
 -- Antes de conectar o frontend:
 -- 1) habilitar Google em Authentication > Providers no projeto Supabase;
