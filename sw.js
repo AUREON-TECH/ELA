@@ -1,8 +1,9 @@
-const CACHE='ela-shell-v4';
+const CACHE='ela-shell-v5';
 const SHELL=[
   './',
   './index.html',
   './calendar.html',
+  './agenda.html',
   './bem-estar.html',
   './insights.html',
   './lembretes.html',
