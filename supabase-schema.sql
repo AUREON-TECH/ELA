@@ -69,7 +69,25 @@ alter table public.wellbeing_entries enable row level security;
 alter table public.diary_entries enable row level security;
 alter table public.agenda_events enable row level security;
 
--- Policies existentes da versão anterior são preservadas; as novas protegem TPM/cólicas.
+-- RLS explícita: cada conta autenticada só pode acessar os próprios dados.
+drop policy if exists "profiles_select_own" on public.profiles;
+drop policy if exists "profiles_insert_own" on public.profiles;
+drop policy if exists "profiles_update_own" on public.profiles;
+drop policy if exists "profiles_delete_own" on public.profiles;
+create policy "profiles_select_own" on public.profiles for select using (auth.uid() = id);
+create policy "profiles_insert_own" on public.profiles for insert with check (auth.uid() = id);
+create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id) with check (auth.uid() = id);
+create policy "profiles_delete_own" on public.profiles for delete using (auth.uid() = id);
+
+drop policy if exists "checkins_select_own" on public.checkins;
+drop policy if exists "checkins_insert_own" on public.checkins;
+drop policy if exists "checkins_update_own" on public.checkins;
+drop policy if exists "checkins_delete_own" on public.checkins;
+create policy "checkins_select_own" on public.checkins for select using (auth.uid() = user_id);
+create policy "checkins_insert_own" on public.checkins for insert with check (auth.uid() = user_id);
+create policy "checkins_update_own" on public.checkins for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "checkins_delete_own" on public.checkins for delete using (auth.uid() = user_id);
+
 drop policy if exists "wellbeing_select_own" on public.wellbeing_entries;
 drop policy if exists "wellbeing_insert_own" on public.wellbeing_entries;
 drop policy if exists "wellbeing_update_own" on public.wellbeing_entries;
@@ -79,10 +97,23 @@ create policy "wellbeing_insert_own" on public.wellbeing_entries for insert with
 create policy "wellbeing_update_own" on public.wellbeing_entries for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "wellbeing_delete_own" on public.wellbeing_entries for delete using (auth.uid() = user_id);
 
--- Crie as policies abaixo apenas se ainda não existirem no projeto:
--- profiles: auth.uid() = id
--- checkins, diary_entries e agenda_events: auth.uid() = user_id
--- A versão inicial deste arquivo já criou essas policies.
+drop policy if exists "diary_select_own" on public.diary_entries;
+drop policy if exists "diary_insert_own" on public.diary_entries;
+drop policy if exists "diary_update_own" on public.diary_entries;
+drop policy if exists "diary_delete_own" on public.diary_entries;
+create policy "diary_select_own" on public.diary_entries for select using (auth.uid() = user_id);
+create policy "diary_insert_own" on public.diary_entries for insert with check (auth.uid() = user_id);
+create policy "diary_update_own" on public.diary_entries for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "diary_delete_own" on public.diary_entries for delete using (auth.uid() = user_id);
+
+drop policy if exists "agenda_select_own" on public.agenda_events;
+drop policy if exists "agenda_insert_own" on public.agenda_events;
+drop policy if exists "agenda_update_own" on public.agenda_events;
+drop policy if exists "agenda_delete_own" on public.agenda_events;
+create policy "agenda_select_own" on public.agenda_events for select using (auth.uid() = user_id);
+create policy "agenda_insert_own" on public.agenda_events for insert with check (auth.uid() = user_id);
+create policy "agenda_update_own" on public.agenda_events for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "agenda_delete_own" on public.agenda_events for delete using (auth.uid() = user_id);
 
 create index if not exists checkins_user_date_idx on public.checkins(user_id, checkin_date desc);
 create index if not exists wellbeing_user_date_idx on public.wellbeing_entries(user_id, entry_date desc);
