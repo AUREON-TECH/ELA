@@ -69,6 +69,34 @@ alter table public.agenda_events add column if not exists completed boolean not 
 alter table public.agenda_events add column if not exists completed_at timestamptz;
 alter table public.agenda_events add column if not exists updated_at timestamptz not null default now();
 
+-- Mantém updated_at confiável para futura sincronização entre aparelhos.
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_set_updated_at on public.profiles;
+create trigger profiles_set_updated_at before update on public.profiles
+for each row execute function public.set_updated_at();
+
+drop trigger if exists wellbeing_set_updated_at on public.wellbeing_entries;
+create trigger wellbeing_set_updated_at before update on public.wellbeing_entries
+for each row execute function public.set_updated_at();
+
+drop trigger if exists diary_set_updated_at on public.diary_entries;
+create trigger diary_set_updated_at before update on public.diary_entries
+for each row execute function public.set_updated_at();
+
+drop trigger if exists agenda_set_updated_at on public.agenda_events;
+create trigger agenda_set_updated_at before update on public.agenda_events
+for each row execute function public.set_updated_at();
+
 alter table public.profiles enable row level security;
 alter table public.checkins enable row level security;
 alter table public.wellbeing_entries enable row level security;
