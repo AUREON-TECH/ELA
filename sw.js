@@ -1,4 +1,4 @@
-const CACHE='ela-shell-v6';
+const CACHE='ela-shell-v7';
 const SHELL=[
   './',
   './index.html',
@@ -34,6 +34,22 @@ function safe(res){
   const cc=res.headers.get('cache-control')||'',vary=res.headers.get('vary')||'';
   return res.ok&&!/private|no-store/i.test(cc)&&!res.headers.has('set-cookie')&&!res.headers.has('content-range')&&!/authorization|cookie/i.test(vary);
 }
+
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const requested=event.notification&&event.notification.data&&event.notification.data.url;
+  const target=new URL(requested||'./index.html',self.registration.scope).href;
+  event.waitUntil(
+    clients.matchAll({type:'window',includeUncontrolled:true}).then(windows=>{
+      const sameOrigin=windows.find(w=>new URL(w.url).origin===new URL(target).origin);
+      if(sameOrigin){
+        if('navigate'in sameOrigin)return sameOrigin.navigate(target).then(()=>sameOrigin.focus());
+        return sameOrigin.focus();
+      }
+      return clients.openWindow?clients.openWindow(target):undefined;
+    })
+  );
+});
 
 self.addEventListener('fetch',e=>{
   const req=e.request,url=new URL(req.url);
