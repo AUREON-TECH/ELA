@@ -13,6 +13,7 @@ as $$
     'exported_at', now(),
     'profile', (select to_jsonb(p) from public.profiles p where p.id = auth.uid()),
     'checkins', coalesce((select jsonb_agg(to_jsonb(c) order by c.checkin_date desc) from public.checkins c where c.user_id = auth.uid()), '[]'::jsonb),
+    'wellbeing_entries', coalesce((select jsonb_agg(to_jsonb(w) order by w.entry_date desc) from public.wellbeing_entries w where w.user_id = auth.uid()), '[]'::jsonb),
     'diary_entries', coalesce((select jsonb_agg(to_jsonb(d) order by d.entry_date desc) from public.diary_entries d where d.user_id = auth.uid()), '[]'::jsonb),
     'agenda_events', coalesce((select jsonb_agg(to_jsonb(a) order by a.event_date) from public.agenda_events a where a.user_id = auth.uid()), '[]'::jsonb),
     'preferences', (select to_jsonb(up) from public.user_preferences up where up.user_id = auth.uid()),
@@ -36,6 +37,7 @@ begin
   delete from public.reminders where user_id = auth.uid();
   delete from public.agenda_events where user_id = auth.uid();
   delete from public.diary_entries where user_id = auth.uid();
+  delete from public.wellbeing_entries where user_id = auth.uid();
   delete from public.checkins where user_id = auth.uid();
   delete from public.user_preferences where user_id = auth.uid();
   delete from public.profiles where id = auth.uid();
@@ -45,5 +47,5 @@ $$;
 revoke all on function public.delete_my_ela_data() from public;
 grant execute on function public.delete_my_ela_data() to authenticated;
 
-comment on function public.export_my_ela_data() is 'Exporta em JSON somente os dados ELA da usuária autenticada.';
-comment on function public.delete_my_ela_data() is 'Apaga somente os dados ELA da usuária autenticada; não exclui auth.users.';
+comment on function public.export_my_ela_data() is 'Exporta em JSON somente os dados ELA da usuária autenticada, incluindo bem-estar.';
+comment on function public.delete_my_ela_data() is 'Apaga somente os dados ELA da usuária autenticada, incluindo bem-estar; não exclui auth.users.';
