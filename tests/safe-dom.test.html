@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>ELA • Safe DOM tests</title></head>
+<body>
+<div id="fixture"></div>
+<pre id="results"></pre>
+<script src="../safe-dom.js"></script>
+<script>
+(function () {
+  'use strict';
+  var cases = [
+    '<script>window.__elaXss=1<\/script>',
+    '<img src=x onerror="window.__elaXss=1">',
+    'A&B "teste"',
+    'cólica 😣',
+    'ansiedade 🌷'
+  ];
+  var fixture = document.getElementById('fixture');
+  var results = [];
+  cases.forEach(function (value) {
+    fixture.replaceChildren();
+    var row = ELASafeDOM.createTextElement('div', value, 'personal-data');
+    fixture.appendChild(row);
+    var ok = row.textContent === value && row.children.length === 0 && !window.__elaXss;
+    results.push((ok ? 'PASS' : 'FAIL') + ' — ' + value);
+  });
+  document.getElementById('results').textContent = results.join('\n');
+  document.title = results.every(function (x) { return x.indexOf('PASS') === 0; }) ? 'PASS • ELA Safe DOM' : 'FAIL • ELA Safe DOM';
+})();
+</script>
+</body>
+</html>
