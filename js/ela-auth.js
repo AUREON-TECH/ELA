@@ -53,13 +53,17 @@
     return state;
   }
 
+  function accountReturnUrl() {
+    const base = location.href.split('#')[0].split('?')[0];
+    return base.endsWith('conta.html') ? base : new URL('./conta.html', base).href;
+  }
+
   async function signInWithGoogle() {
     await init();
     if (!state.client) throw new Error('ELA_AUTH_NOT_CONFIGURED');
-    const redirectTo = location.origin + location.pathname.replace(/[^/]*$/, '');
     return state.client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: redirectTo }
+      options: { redirectTo: accountReturnUrl() }
     });
   }
 
