@@ -56,11 +56,37 @@
     }
   }
 
+  function cloneState(state) {
+    try {
+      const cloned = JSON.parse(JSON.stringify(state));
+      return isObject(cloned) ? cloned : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  // Atualiza o estado em uma única operação: lê a fonte recuperável mais recente,
+  // trabalha sobre uma cópia e só então persiste. Se a função de atualização falhar,
+  // o estado anterior permanece intacto.
+  function update(mutator) {
+    if (typeof mutator !== 'function') return { ok: false, state: read() };
+    const current = read();
+    const next = cloneState(current);
+    try {
+      const result = mutator(next);
+      const candidate = isObject(result) ? result : next;
+      if (!write(candidate)) return { ok: false, state: current };
+      return { ok: true, state: candidate };
+    } catch (_) {
+      return { ok: false, state: current };
+    }
+  }
+
   function list(state, name, limit) {
     const source = isObject(state) && Array.isArray(state[name]) ? state[name] : [];
     const max = Math.max(0, Math.min(Number(limit) || 30, 100));
     return source.filter(isObject).slice(0, max);
   }
 
-  window.ELAStorageSafe = Object.freeze({ read, write, list });
+  window.ELAStorageSafe = Object.freeze({ read, write, update, list });
 })();
