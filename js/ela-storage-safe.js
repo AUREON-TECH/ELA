@@ -1,5 +1,6 @@
 /* ELA — acesso defensivo ao estado local.
  * Evita que JSON corrompido ou falhas do armazenamento derrubem telas do app.
+ * Mantém uma cópia local de recuperação antes de sobrescrever o estado atual.
  * Não envia nem sincroniza dados.
  */
 (function () {
@@ -7,29 +8,46 @@
 
   const KEYS = Object.freeze(['ela-pwa-v2', 'ela-pwa-v1']);
   const CURRENT_KEY = KEYS[0];
+  const BACKUP_KEY = CURRENT_KEY + '-backup';
 
   function isObject(value) {
     return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function parseObject(raw) {
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return isObject(parsed) ? parsed : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   function read() {
     for (const key of KEYS) {
       let raw = '';
       try { raw = localStorage.getItem(key) || ''; } catch (_) { return {}; }
-      if (!raw) continue;
-      try {
-        const parsed = JSON.parse(raw);
-        if (isObject(parsed)) return parsed;
-      } catch (_) {
-        // Tenta a versão anterior sem apagar o dado inválido.
-      }
+      const parsed = parseObject(raw);
+      if (parsed) return parsed;
+      // Se o estado atual estiver corrompido, preserva-o e tenta outras fontes.
     }
-    return {};
+
+    // Último recurso: cópia local criada antes da gravação mais recente.
+    try {
+      return parseObject(localStorage.getItem(BACKUP_KEY) || '') || {};
+    } catch (_) {
+      return {};
+    }
   }
 
   function write(state) {
     if (!isObject(state)) return false;
     try {
+      const previous = localStorage.getItem(CURRENT_KEY);
+      // Só cria backup quando o estado anterior é JSON válido; nunca substitui um
+      // backup recuperável por conteúdo corrompido.
+      if (parseObject(previous)) localStorage.setItem(BACKUP_KEY, previous);
       localStorage.setItem(CURRENT_KEY, JSON.stringify(state));
       return true;
     } catch (_) {
