@@ -15,6 +15,21 @@
     container.appendChild(p);
   }
 
+  function safeEnergy(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) return '—';
+    return Math.min(10, Math.max(1, Math.round(n)));
+  }
+
+  function safeSymptoms(value) {
+    if (!Array.isArray(value)) return [];
+    return value
+      .filter(function (item) { return typeof item === 'string'; })
+      .map(function (item) { return item.trim(); })
+      .filter(Boolean)
+      .slice(0, 20);
+  }
+
   function renderHistorySafe(container, state) {
     if (!container) return;
     container.replaceChildren();
@@ -23,8 +38,9 @@
     var notes = Array.isArray(state && state.notes) ? state.notes.slice(0, 3) : [];
 
     checkins.forEach(function (entry) {
-      var symptoms = Array.isArray(entry.symptoms) ? entry.symptoms : [];
-      var energy = Number.isFinite(Number(entry.energy)) ? Number(entry.energy) : '—';
+      entry = entry && typeof entry === 'object' ? entry : {};
+      var symptoms = safeSymptoms(entry.symptoms);
+      var energy = safeEnergy(entry.energy);
       appendParagraph(container, [
         { text: entry.date || '—', bold: true },
         { text: ' · ' + (entry.mood || '—') + ' · Energia ' + energy + '/10' + (symptoms.length ? ' · ' + symptoms.join(', ') : '') }
@@ -32,6 +48,7 @@
     });
 
     notes.forEach(function (entry) {
+      entry = entry && typeof entry === 'object' ? entry : {};
       var date = new Date(entry.date);
       var label = Number.isNaN(date.getTime()) ? 'data não informada' : date.toLocaleDateString('pt-BR');
       appendParagraph(container, [
