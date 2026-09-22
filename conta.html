@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d81b60">
+<link rel="manifest" href="./manifest.webmanifest">
+<!-- Configure estes dois metadados somente com URL e chave PUBLICA anon do projeto Supabase. -->
+<meta name="ela-supabase-url" content="">
+<meta name="ela-supabase-anon-key" content="">
+<title>ELA • Minha conta</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(160deg,#fff0f6,#f3e5f5);color:#42162f}.app{max-width:760px;margin:auto;padding:14px 14px 40px}.hero{background:linear-gradient(135deg,#e91e63,#8e24aa,#ff7043);color:#fff;padding:22px;border-radius:26px;box-shadow:0 16px 45px #8e245033}.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 8px 25px #6d214f14}.small{opacity:.72;font-size:13px;line-height:1.5}.btn{width:100%;border:0;cursor:pointer;background:linear-gradient(135deg,#d81b60,#8e24aa);color:#fff;font:inherit;font-weight:800;border-radius:14px;padding:14px;margin-top:10px}.btn.secondary{background:#fff;color:#8e24aa;border:1px solid #ead3e3}.status{padding:12px;border-radius:14px;background:#fff5fa;margin-top:12px;line-height:1.45}.back{display:block;text-align:center;color:#8e24aa;text-decoration:none;font-weight:800;margin-top:16px}@media(max-width:480px){.app{padding:10px}.hero{border-radius:22px}}
+</style>
+</head>
+<body><main class="app">
+<section class="hero"><div class="small">ELA • PRIVADO E SEU</div><h1>Minha conta 🌷</h1><p>Uma conta permite preparar a sincronização segura dos seus dados entre dispositivos.</p></section>
+<section class="card">
+<strong id="title">Entrar com Google</strong>
+<p class="small" id="description">O ELA só inicia a autenticação quando o Supabase estiver configurado com a URL e a chave pública do projeto.</p>
+<div id="status" class="status" role="status" aria-live="polite">Verificando configuração…</div>
+<button class="btn" id="google" type="button" disabled>Continuar com Google</button>
+<button class="btn secondary" id="logout" type="button" hidden>Sair da conta</button>
+<p class="small">Seus dados de ciclo, humor, sintomas e bem-estar são pessoais. O login não deve usar chave administrativa no navegador.</p>
+</section>
+<a class="back" href="./eu.html">← Voltar para Eu</a>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/ela-auth.js"></script>
+<script>
+(function(){
+ const status=document.getElementById('status'),google=document.getElementById('google'),logout=document.getElementById('logout'),title=document.getElementById('title'),description=document.getElementById('description');
+ function text(v){status.textContent=v}
+ async function render(){
+   if(!window.ELAAuth||!ELAAuth.isConfigured()){
+     text('Login ainda não configurado. O app continua utilizável localmente; nenhuma autenticação foi iniciada.');
+     google.disabled=true; logout.hidden=true; return;
+   }
+   try{
+     await ELAAuth.init(); const user=await ELAAuth.currentUser();
+     if(user){
+       title.textContent='Conta conectada ✓'; description.textContent=user.email?'Conectada como '+user.email:'Sua sessão está ativa.';
+       text('Sessão protegida ativa neste dispositivo.'); google.hidden=true; logout.hidden=false;
+     }else{
+       title.textContent='Entrar com Google'; description.textContent='Conecte sua conta para habilitar a próxima etapa de sincronização privada.';
+       text('Supabase configurado. Você pode entrar com Google.'); google.disabled=false; google.hidden=false; logout.hidden=true;
+     }
+   }catch(e){ text('Não foi possível verificar a sessão agora.'); }
+ }
+ google.addEventListener('click',async()=>{google.disabled=true;text('Abrindo login seguro…');try{await ELAAuth.signInWithGoogle()}catch(e){text('Login indisponível: verifique a configuração do Google no Supabase.');google.disabled=false}});
+ logout.addEventListener('click',async()=>{logout.disabled=true;try{await ELAAuth.signOut();location.reload()}catch(e){text('Não foi possível sair agora.');logout.disabled=false}});
+ window.addEventListener('ela:auth-change',render); render();
+ if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+})();
+</script></body></html>
