@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>ELA • teste histórico seguro</title></head>
+<body>
+  <div id="history"></div>
+  <pre id="result">Executando…</pre>
+  <script src="../js/ela-history-safe.js"></script>
+  <script>
+    (function () {
+      const result = document.getElementById('result');
+      const history = document.getElementById('history');
+      const failures = [];
+      const assert = (condition, message) => { if (!condition) failures.push(message); };
+
+      const payload = '<img src=x onerror="window.__elaInjected=true">';
+      window.__elaInjected = false;
+      ELAHistorySafe.renderHistorySafe(history, {
+        checkins: [{ date: '2026-09-22', mood: payload, energy: 8, symptoms: ['Cólica 😣', payload] }],
+        notes: [{ date: '2026-09-22T10:00:00.000Z', text: payload }]
+      });
+
+      assert(window.__elaInjected === false, 'conteúdo pessoal não pode executar código');
+      assert(history.querySelector('img') === null, 'payload HTML deve permanecer apenas texto');
+      assert(history.textContent.includes(payload), 'texto original deve ser preservado');
+      assert(history.textContent.includes('Cólica 😣'), 'acentos e emoji devem ser preservados');
+      assert(history.textContent.includes('Energia 8/10'), 'energia deve ser renderizada');
+
+      ELAHistorySafe.renderHistorySafe(history, {});
+      assert(history.textContent === 'Nenhum registro ainda.', 'estado vazio deve ser exibido corretamente');
+
+      result.textContent = failures.length ? 'FALHOU\n- ' + failures.join('\n- ') : 'OK — histórico seguro passou nos testes.';
+      result.dataset.status = failures.length ? 'fail' : 'pass';
+    })();
+  </script>
+</body>
+</html>
