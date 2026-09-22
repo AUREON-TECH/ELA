@@ -1,4 +1,4 @@
-const CACHE='ela-shell-v9';
+const CACHE='ela-shell-v10';
 const SHELL=[
   './',
   './index.html',
@@ -14,6 +14,7 @@ const SHELL=[
   './ela-ia.html',
   './js/ela-auth.js',
   './js/ela-insights-safe.js',
+  './js/ela-history-safe.js',
   './manifest.webmanifest',
   './icon-192.svg',
   './icon-512.svg'
