@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>ELAStorageSafe tests</title></head>
+<body>
+<pre id="out"></pre>
+<script>
+const out=document.getElementById('out');
+const results=[];
+function test(name,fn){try{fn();results.push('✅ '+name)}catch(e){results.push('❌ '+name+' — '+e.message)}}
+function assert(value,message){if(!value)throw new Error(message||'falhou')}
+function reset(){['ela-pwa-v2','ela-pwa-v1','ela-pwa-v2-backup'].forEach(k=>localStorage.removeItem(k))}
+reset();
+</script>
+<script src="../js/ela-storage-safe.js"></script>
+<script>
+test('estado vazio retorna objeto',()=>{reset();const s=ELAStorageSafe.read();assert(s&&typeof s==='object'&&!Array.isArray(s))});
+test('JSON corrompido não derruba leitura',()=>{reset();localStorage.setItem('ela-pwa-v2','{invalido');const s=ELAStorageSafe.read();assert(s&&typeof s==='object')});
+test('usa estado legado quando atual está corrompido',()=>{reset();localStorage.setItem('ela-pwa-v2','{x');localStorage.setItem('ela-pwa-v1',JSON.stringify({zodiac:'Touro'}));assert(ELAStorageSafe.read().zodiac==='Touro')});
+test('write persiste estado válido',()=>{reset();assert(ELAStorageSafe.write({zodiac:'Peixes'})===true);assert(ELAStorageSafe.read().zodiac==='Peixes')});
+test('write rejeita valores que não são objeto',()=>{reset();assert(ELAStorageSafe.write(null)===false);assert(ELAStorageSafe.write([])===false)});
+test('update preserva campos e aplica alteração',()=>{reset();ELAStorageSafe.write({zodiac:'Áries',checkins:[{mood:'bem'}]});const r=ELAStorageSafe.update(s=>{s.zodiac='Libra'});assert(r.ok===true);assert(r.state.zodiac==='Libra');assert(r.state.checkins.length===1)});
+test('update com erro mantém estado anterior',()=>{reset();ELAStorageSafe.write({zodiac:'Virgem'});const r=ELAStorageSafe.update(()=>{throw new Error('teste')});assert(r.ok===false);assert(ELAStorageSafe.read().zodiac==='Virgem')});
+test('list filtra itens inválidos e respeita limite',()=>{const s={checkins:[{id:1},null,'x',{id:2},{id:3}]};const list=ELAStorageSafe.list(s,'checkins',2);assert(list.length===2&&list[0].id===1&&list[1].id===2)});
+reset();out.textContent=results.join('\n')+'\n\n'+results.filter(x=>x.startsWith('✅')).length+'/'+results.length+' testes passaram';
+</script>
+</body></html>
