@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>ELA • Insights Safe tests</title></head>
+<body>
+<div id="fixture"></div>
+<pre id="results"></pre>
+<script src="../js/ela-insights-safe.js"></script>
+<script>
+(function () {
+  'use strict';
+  var fixture = document.getElementById('fixture');
+  var results = [];
+  var malicious = '<img src=x onerror="window.__elaInsightsXss=1">';
+
+  ELAInsightsSafe.clear(fixture);
+  ELAInsightsSafe.line(fixture, [{ strong: malicious }, ' · 2 registros'], 'insight');
+  results.push((fixture.textContent.indexOf(malicious) >= 0 && !window.__elaInsightsXss && fixture.querySelectorAll('img').length === 0 ? 'PASS' : 'FAIL') + ' — humor como texto');
+
+  ELAInsightsSafe.clear(fixture);
+  ELAInsightsSafe.symptom(fixture, malicious, 3, 4);
+  var fill = fixture.querySelector('.bar i');
+  results.push((fixture.textContent.indexOf(malicious) >= 0 && !window.__elaInsightsXss && fixture.querySelectorAll('img').length === 0 ? 'PASS' : 'FAIL') + ' — sintoma como texto');
+  results.push((fill && fill.style.width === '75%' ? 'PASS' : 'FAIL') + ' — barra limitada/calculada');
+
+  ELAInsightsSafe.clear(fixture);
+  ELAInsightsSafe.text(fixture, 'cólica 😣 · ansiedade 🌷');
+  results.push((fixture.textContent === 'cólica 😣 · ansiedade 🌷' ? 'PASS' : 'FAIL') + ' — acentos e emojis');
+
+  ELAInsightsSafe.clear(fixture);
+  ELAInsightsSafe.symptom(fixture, 'teste', 999, 1);
+  fill = fixture.querySelector('.bar i');
+  results.push((fill && fill.style.width === '100%' ? 'PASS' : 'FAIL') + ' — barra não excede 100%');
+
+  document.getElementById('results').textContent = results.join('\n');
+  document.title = results.every(function (x) { return x.indexOf('PASS') === 0; }) ? 'PASS • ELA Insights Safe' : 'FAIL • ELA Insights Safe';
+})();
+</script>
+</body>
+</html>
