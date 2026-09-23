@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ELA • testes de padrões pessoais</title>
+<pre id="out">Executando…</pre>
+<script src="../js/ela-personal-patterns.js"></script>
+<script>
+(function(){
+  const out=document.getElementById('out'), lines=[];
+  function ok(name, condition){if(!condition) throw new Error(name); lines.push('✓ '+name)}
+  function run(){
+    const A=window.ELAPersonalPatterns;
+    ok('API carregada', !!A && typeof A.analyze==='function');
+    let r=A.analyze({});
+    ok('sem dados não inventa padrão', r.ready===false && r.insights.length===0);
+    r=A.analyze({checkins:[
+      {date:'2026-09-01',mood:'Bem',energy:8,symptoms:['Cólica']},
+      {date:'2026-09-02',mood:'Bem',energy:6,symptoms:['Cólica','Inchaço']},
+      {date:'2026-09-03',mood:'Sensível',energy:4,symptoms:['Inchaço']}
+    ]});
+    ok('três check-ins habilitam leitura', r.ready===true && r.checkinCount===3);
+    ok('gera energia média', r.insights.some(x=>x.title==='Energia média' && x.text.includes('6.0/10')));
+    ok('gera humor predominante', r.insights.some(x=>x.title==='Humor mais frequente' && x.text.includes('Bem')));
+    ok('gera sintomas sem diagnóstico', r.insights.some(x=>x.title==='Sintomas mais registrados'));
+    r=A.analyze({wellbeing:[
+      {date:'2026-09-01',pms:4,cramp:3},{date:'2026-09-02',pms:2,cramp:1},{date:'2026-09-03',pms:0,cramp:2}
+    ]});
+    ok('bem-estar isolado também gera leitura após 3 registros', r.ready===true && r.wellbeingCount===3);
+    ok('calcula TPM/cólicas', r.insights.some(x=>x.title==='TPM e cólicas'));
+    r=A.analyze({checkins:[{date:'inválida',energy:10},{date:'2026-09-01',energy:99},{date:'2026-09-02',energy:-9},{date:'2026-09-03',energy:5}]});
+    ok('ignora data inválida e limita escalas', r.checkinCount===3 && r.insights.some(x=>x.title==='Energia média' && x.text.includes('5.0/10')));
+    ok('mantém aviso de segurança', /não diagnóstico/i.test(r.disclaimer));
+    out.textContent=lines.join('\n')+'\n\nTodos os testes passaram.';
+  }
+  try{run()}catch(e){out.textContent=lines.join('\n')+'\n✗ '+e.message; throw e}
+})();
+</script>
