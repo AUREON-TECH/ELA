@@ -1,4 +1,4 @@
-const CACHE='ela-shell-v12';
+const CACHE='ela-shell-v13';
 const SHELL=[
   './',
   './index.html',
@@ -43,16 +43,36 @@ function safe(res){
   return res.ok&&!/private|no-store/i.test(cc)&&!res.headers.has('set-cookie')&&!res.headers.has('content-range')&&!/authorization|cookie/i.test(vary);
 }
 
+function notificationTarget(requested){
+  const fallback=new URL('./index.html',self.registration.scope);
+  try{
+    const target=new URL(requested||fallback.href,self.registration.scope);
+    const scope=new URL(self.registration.scope);
+    // Notificações do ELA nunca devem redirecionar para outra origem nem sair
+    // do escopo instalado do PWA, mesmo que data.url esteja malformado/adulterado.
+    if(target.origin!==scope.origin||!target.pathname.startsWith(scope.pathname))return fallback.href;
+    return target.href;
+  }catch(_){
+    return fallback.href;
+  }
+}
+
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
   const requested=event.notification&&event.notification.data&&event.notification.data.url;
-  const target=new URL(requested||'./index.html',self.registration.scope).href;
+  const target=notificationTarget(requested);
   event.waitUntil(
     clients.matchAll({type:'window',includeUncontrolled:true}).then(windows=>{
-      const sameOrigin=windows.find(w=>new URL(w.url).origin===new URL(target).origin);
-      if(sameOrigin){
-        if('navigate'in sameOrigin)return sameOrigin.navigate(target).then(()=>sameOrigin.focus());
-        return sameOrigin.focus();
+      const targetUrl=new URL(target);
+      const sameApp=windows.find(w=>{
+        try{
+          const current=new URL(w.url);
+          return current.origin===targetUrl.origin&&current.pathname.startsWith(new URL(self.registration.scope).pathname);
+        }catch(_){return false;}
+      });
+      if(sameApp){
+        if('navigate'in sameApp)return sameApp.navigate(target).then(()=>sameApp.focus());
+        return sameApp.focus();
       }
       return clients.openWindow?clients.openWindow(target):undefined;
     })
