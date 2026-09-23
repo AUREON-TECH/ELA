@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ELA • Testes do motor de ciclo</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 16px;color:#42162f;background:#fff7fa}
+    h1{color:#c2185b}.ok{color:#087f5b}.fail{color:#c92a2a}li{margin:10px 0}
+  </style>
+</head>
+<body>
+  <h1>Testes — ELACycleInsights</h1>
+  <p>Valida cálculos determinísticos sem enviar ou persistir dados.</p>
+  <ol id="results"></ol>
+  <script src="../js/ela-cycle-insights.js"></script>
+  <script>
+    (() => {
+      'use strict';
+      const results = document.getElementById('results');
+      let failed = 0;
+      function test(name, fn) {
+        const li = document.createElement('li');
+        try { fn(); li.className = 'ok'; li.textContent = '✓ ' + name; }
+        catch (error) { failed += 1; li.className = 'fail'; li.textContent = '✗ ' + name + ' — ' + error.message; }
+        results.appendChild(li);
+      }
+      function equal(actual, expected) {
+        if (actual !== expected) throw new Error(`esperado ${expected}; recebido ${actual}`);
+      }
+      function truthy(value, message) { if (!value) throw new Error(message || 'valor inválido'); }
+
+      test('normaliza, ordena e remove datas duplicadas', () => {
+        const dates = ELACycleInsights.normalizeStarts(['2026-09-01','inválida','2026-08-04','2026-09-01']);
+        equal(dates.join(','), '2026-08-04,2026-09-01');
+      });
+
+      test('usa fallback seguro quando ainda não existe histórico', () => {
+        const x = ELACycleInsights.analyze([], 28);
+        equal(x.ready, false); equal(x.cycleLength, 28); equal(x.confidence, 'insuficiente');
+      });
+
+      test('limita fallback a uma faixa plausível', () => {
+        equal(ELACycleInsights.analyze([], 10).cycleLength, 21);
+        equal(ELACycleInsights.analyze([], 99).cycleLength, 40);
+      });
+
+      test('calcula mediana do ciclo e próxima menstruação', () => {
+        const x = ELACycleInsights.analyze(['2026-06-01','2026-06-29','2026-07-27','2026-08-24'], 30);
+        equal(x.cycleLength, 28); equal(x.nextPeriodEstimate, '2026-09-21'); equal(x.confidence, 'melhor');
+      });
+
+      test('calcula janela fértil, ovulação e TPM', () => {
+        const x = ELACycleInsights.analyze(['2026-07-27','2026-08-24'], 28);
+        equal(x.ovulationEstimate, '2026-09-07');
+        equal(x.fertileWindow.start, '2026-09-02');
+        equal(x.fertileWindow.end, '2026-09-08');
+        equal(x.pmsEstimate.start, '2026-09-14');
+        equal(x.pmsEstimate.end, '2026-09-20');
+      });
+
+      test('ignora intervalos fora da faixa de 15 a 60 dias', () => {
+        const x = ELACycleInsights.analyze(['2026-01-01','2026-01-05','2026-02-02'], 28);
+        equal(x.cycleLength, 28); equal(x.confidence, 'limitada');
+      });
+
+      test('mantém aviso de saúde no resultado', () => {
+        const x = ELACycleInsights.analyze(['2026-08-24'], 28);
+        truthy(x.disclaimer && x.disclaimer.includes('Não são diagnóstico'), 'disclaimer ausente');
+      });
+
+      document.title += failed ? ` — ${failed} falha(s)` : ' — OK';
+    })();
+  </script>
+</body>
+</html>
