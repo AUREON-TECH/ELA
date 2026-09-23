@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>ELA Zodiac Safe tests</title></head>
+<body>
+<pre id="out"></pre>
+<script>
+(function () {
+  'use strict';
+  const out = document.getElementById('out');
+  const results = [];
+  function test(name, fn) {
+    try { fn(); results.push('✓ ' + name); }
+    catch (err) { results.push('✗ ' + name + ' — ' + err.message); }
+  }
+  function equal(actual, expected, message) {
+    if (actual !== expected) throw new Error(message || (JSON.stringify(actual) + ' !== ' + JSON.stringify(expected)));
+  }
+
+  let state = {};
+  let failUpdate = false;
+  window.ELAStorageSafe = {
+    read() { return JSON.parse(JSON.stringify(state)); },
+    update(mutator) {
+      const previous = JSON.parse(JSON.stringify(state));
+      const next = JSON.parse(JSON.stringify(state));
+      try {
+        mutator(next);
+        if (failUpdate) return { ok: false, state: previous };
+        state = next;
+        return { ok: true, state: JSON.parse(JSON.stringify(state)) };
+      } catch (_) {
+        return { ok: false, state: previous };
+      }
+    }
+  };
+
+  window.__runZodiacTests = function () {
+    test('aceita os 12 signos previstos', function () {
+      equal(window.ELAZodiacSafe.signs.length, 12);
+      window.ELAZodiacSafe.signs.forEach(function (sign) { equal(window.ELAZodiacSafe.normalize(sign), sign); });
+    });
+
+    test('rejeita valor de signo desconhecido', function () {
+      equal(window.ELAZodiacSafe.normalize('Ofiúco'), '');
+      equal(window.ELAZodiacSafe.normalize(null), '');
+    });
+
+    test('lê zodiac atual sem regravar estado', function () {
+      state = { zodiac: 'Leão', mood: 'bem' };
+      const result = window.ELAZodiacSafe.read();
+      equal(result.zodiac, 'Leão');
+      equal(result.migrated, false);
+      equal(state.mood, 'bem');
+    });
+
+    test('migra signo legado para zodiac preservando outros dados', function () {
+      state = { signo: 'Peixes', checkins: [{ mood: 'calma' }] };
+      const result = window.ELAZodiacSafe.read();
+      equal(result.zodiac, 'Peixes');
+      equal(result.migrated, true);
+      equal(state.signo, undefined);
+      equal(state.zodiac, 'Peixes');
+      equal(state.checkins[0].mood, 'calma');
+    });
+
+    test('salva signo válido preservando estado pessoal', function () {
+      state = { mood: 'feliz', symptoms: ['cólica'] };
+      const result = window.ELAZodiacSafe.save('Áries');
+      equal(result.ok, true);
+      equal(state.zodiac, 'Áries');
+      equal(state.mood, 'feliz');
+      equal(state.symptoms[0], 'cólica');
+    });
+
+    test('falha de gravação mantém o signo anterior', function () {
+      state = { zodiac: 'Touro', mood: 'ok' };
+      failUpdate = true;
+      const result = window.ELAZodiacSafe.save('Virgem');
+      failUpdate = false;
+      equal(result.ok, false);
+      equal(result.zodiac, 'Touro');
+      equal(state.zodiac, 'Touro');
+      equal(state.mood, 'ok');
+    });
+
+    test('valor inválido remove zodiac sem afetar outros campos', function () {
+      state = { zodiac: 'Libra', energy: 7 };
+      const result = window.ELAZodiacSafe.save('inválido');
+      equal(result.ok, true);
+      equal(state.zodiac, undefined);
+      equal(state.energy, 7);
+    });
+
+    out.textContent = results.join('\n') + '\n\n' + results.filter(r => r[0] === '✓').length + '/' + results.length + ' testes passaram.';
+  };
+})();
+</script>
+<script src="../js/ela-zodiac-safe.js" onload="window.__runZodiacTests()"></script>
+</body>
+</html>
