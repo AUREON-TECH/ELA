@@ -1,4 +1,4 @@
-const CACHE='ela-shell-v13';
+const CACHE='ela-shell-v14';
 const SHELL=[
   './',
   './index.html',
@@ -18,6 +18,7 @@ const SHELL=[
   './js/ela-history-safe.js',
   './js/ela-storage-safe.js',
   './js/ela-zodiac-safe.js',
+  './js/ela-reminders-safe.js',
   './manifest.webmanifest',
   './icon-192.svg',
   './icon-512.svg'
@@ -48,8 +49,6 @@ function notificationTarget(requested){
   try{
     const target=new URL(requested||fallback.href,self.registration.scope);
     const scope=new URL(self.registration.scope);
-    // Notificações do ELA nunca devem redirecionar para outra origem nem sair
-    // do escopo instalado do PWA, mesmo que data.url esteja malformado/adulterado.
     if(target.origin!==scope.origin||!target.pathname.startsWith(scope.pathname))return fallback.href;
     return target.href;
   }catch(_){
