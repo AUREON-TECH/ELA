@@ -1,4 +1,4 @@
-const CACHE='ela-shell-v15';
+const CACHE='ela-shell-v16';
 const SHELL=[
   './',
   './index.html',
@@ -20,6 +20,8 @@ const SHELL=[
   './js/ela-zodiac-safe.js',
   './js/ela-zodiac-page.js',
   './js/ela-reminders-safe.js',
+  './js/ela-cycle-insights.js',
+  './js/ela-cycle-calendar-adapter.js',
   './manifest.webmanifest',
   './icon-192.svg',
   './icon-512.svg'
